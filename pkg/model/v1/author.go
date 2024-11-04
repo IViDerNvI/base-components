@@ -1,26 +1,21 @@
 package v1
 
 import (
-	"database/sql/driver"
-
-	"github.com/lib/pq"
+	stringutil "github.com/ividernvi/base-components/pkg/util/stringutil"
 )
 
-type AuthorsUnion pq.StringArray
+type Authors stringutil.StringSet
 
-func (au *AuthorsUnion) Scan(src interface{}) error {
-	return (*pq.StringArray)(au).Scan(src)
+func CreateAuthors(authors ...string) Authors {
+	return Authors(stringutil.CreateStringSet(authors...))
 }
 
-func (au *AuthorsUnion) Value() (driver.Value, error) {
-	return (*pq.StringArray)(au).Value()
+func (authors1 Authors) Equals(authors2 Authors) bool {
+	return stringutil.StringSet(authors1).Equals(stringutil.StringSet(authors2))
 }
 
-func (au *AuthorsUnion) AddAuthor(author string) *AuthorsUnion {
-	*au = append((*au), author)
-	return au
-}
-
-func (au *AuthorsUnion) GetCount() int {
-	return len((*au))
+func (authors Authors) AddAuthor(author ...string) {
+	for _, au := range author {
+		stringutil.StringSet(authors).Add(au)
+	}
 }

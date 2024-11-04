@@ -1,6 +1,11 @@
 package v1
 
-import "time"
+import (
+	"fmt"
+	"time"
+
+	"golang.org/x/crypto/bcrypt"
+)
 
 type User struct {
 	ObjectMeta `json:"metadata,omitempty"`
@@ -18,4 +23,15 @@ type User struct {
 type UserList struct {
 	ListMeta `json:",inline"`
 	Items    []*User `json:"items"`
+}
+
+func (u *User) TableName() string {
+	return "user"
+}
+
+func (u *User) IsPasswordCorrect(pwd string) error {
+	if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(pwd)); err != nil {
+		return fmt.Errorf("failed to compile password: %w", pwd)
+	}
+	return nil
 }

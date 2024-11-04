@@ -1,26 +1,21 @@
 package v1
 
 import (
-	"database/sql/driver"
-
-	"github.com/lib/pq"
+	stringutil "github.com/ividernvi/base-components/pkg/util/stringutil"
 )
 
-type TagsUnion pq.StringArray
+type Tags stringutil.StringSet
 
-func (tu *TagsUnion) Scan(src interface{}) error {
-	return (*pq.StringArray)(tu).Scan(src)
+func CreateTags(tags ...string) Tags {
+	return Tags(stringutil.CreateStringSet(tags...))
 }
 
-func (tu *TagsUnion) Value() (driver.Value, error) {
-	return (*pq.StringArray)(tu).Value()
+func (tags1 Tags) Equals(tags2 Tags) bool {
+	return stringutil.StringSet(tags1).Equals(stringutil.StringSet(tags2))
 }
 
-func (tu *TagsUnion) AddTag(tag string) *TagsUnion {
-	*tu = append((*tu), tag)
-	return tu
-}
-
-func (tu *TagsUnion) GetCount() int {
-	return len((*tu))
+func (tags Tags) AddTag(tag ...string) {
+	for _, tg := range tag {
+		stringutil.StringSet(tags).Add(tg)
+	}
 }
